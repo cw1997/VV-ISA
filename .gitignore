@@ -1,0 +1,7 @@
+# quartus file. add by cw1997 2019/7/29
+db
+simulation
+incremental_db
+output_files
+
+*.bak
