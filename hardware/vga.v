@@ -43,7 +43,7 @@ begin
 	end
 end
 
-reg[18:0] cursor;
+reg[1:0] cursor;
 reg[11:0] row;
 reg[11:0] col;
 reg[11:0] x;
@@ -109,17 +109,18 @@ begin
 		else begin
 			cursor <= cursor + 1;
 		end
-		{vga_r, vga_g, vga_b} = {vga_r, vga_g, vga_b} + 1;
+//		{vga_r, vga_g, vga_b} = {vga_r, vga_g, vga_b} + 1;
 //		if (cursor < 100 && video_memory[cursor]) begin
-//			vga_r <= 3'b111;
-//			vga_g <= 3'b111;
-//			vga_b <= 2'b11; 
-//		end
-//		else begin
-//			vga_r <= 0;
-//			vga_g <= 0;
-//			vga_b <= 0;
-//		end 
+		if (cursor) begin
+			vga_r <= 3'b111;
+			vga_g <= 3'b111;
+			vga_b <= 2'b11; 
+		end
+		else begin
+			vga_r <= 0;
+			vga_g <= 0;
+			vga_b <= 0;
+		end 
 	end
 	else begin
 		vga_r <= 0;
