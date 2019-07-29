@@ -6,6 +6,9 @@ module vga(
 	output reg[2:0] vga_r,
 	output reg[2:0] vga_g,
 	output reg[1:0] vga_b,
+	
+	input[100-1:0] video_memory,
+	
 	output reg clk_25m
 );
 
@@ -23,7 +26,7 @@ module vga(
 
 
 //reg clk_25m;
-reg[1:0] div_cnt;
+reg div_cnt;
 
 always @(posedge clk or negedge rst_n)
 begin
@@ -40,7 +43,7 @@ begin
 	end
 end
 
-
+reg[18:0] cursor;
 reg[11:0] row;
 reg[11:0] col;
 reg[11:0] x;
@@ -82,7 +85,7 @@ localparam VERTICAL_WHOLE_FRAME = 525;
 
 wire visible_area;
 
-assign visible_area = col > (HORIZONTAL_FRONT_PROCH + HORIZONTAL_SYNC_PLUSE) && col < (HORIZONTAL_FRONT_PROCH + HORIZONTAL_SYNC_PLUSE + HORIZONTAL_VISIBLE_AREA) && row > (VERTICAL_FRONT_PROCH + VERTICAL_SYNC_PLUSE) && row < (VERTICAL_FRONT_PROCH + VERTICAL_SYNC_PLUSE + VERTICAL_VISIBLE_AREA);
+assign visible_area = col >= (HORIZONTAL_FRONT_PROCH + HORIZONTAL_SYNC_PLUSE) && col < (HORIZONTAL_FRONT_PROCH + HORIZONTAL_SYNC_PLUSE + HORIZONTAL_VISIBLE_AREA) && row >= (VERTICAL_FRONT_PROCH + VERTICAL_SYNC_PLUSE) && row < (VERTICAL_FRONT_PROCH + VERTICAL_SYNC_PLUSE + VERTICAL_VISIBLE_AREA);
 
 //assign hsync = ~( col > HORIZONTAL_FRONT_PROCH && col <= HORIZONTAL_FRONT_PROCH + HORIZONTAL_SYNC_PLUSE );
 //assign vsync = ~( row > VERTICAL_FRONT_PROCH && row <= VERTICAL_FRONT_PROCH + VERTICAL_SYNC_PLUSE );
@@ -97,11 +100,26 @@ begin
 		vga_r <= 0;
 		vga_g <= 0;
 		vga_b <= 0;
+		cursor <= 0;
 	end 
 	else if (visible_area) begin
-		vga_r <= 3'b111;
-		vga_g <= 3'b000;
-		vga_b <= 2'b00; 
+		if (cursor == 640*480-1) begin
+			cursor <= 0;
+		end
+		else begin
+			cursor <= cursor + 1;
+		end
+		{vga_r, vga_g, vga_b} = {vga_r, vga_g, vga_b} + 1;
+//		if (cursor < 100 && video_memory[cursor]) begin
+//			vga_r <= 3'b111;
+//			vga_g <= 3'b111;
+//			vga_b <= 2'b11; 
+//		end
+//		else begin
+//			vga_r <= 0;
+//			vga_g <= 0;
+//			vga_b <= 0;
+//		end 
 	end
 	else begin
 		vga_r <= 0;
