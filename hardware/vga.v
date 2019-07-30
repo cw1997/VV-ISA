@@ -60,16 +60,16 @@ reg[11:0] x;
 reg[11:0] y;
 
 
-localparam HORIZONTAL_FRONT_PROCH = 16;
 localparam HORIZONTAL_SYNC_PLUSE = 96;
 localparam HORIZONTAL_VISIBLE_AREA = 640;
 localparam HORIZONTAL_BACK_PROCH = 48;
+localparam HORIZONTAL_FRONT_PROCH = 16;
 localparam HORIZONTAL_WHOLE_LINE = 800;
 
-localparam VERTICAL_FRONT_PROCH = 10;
 localparam VERTICAL_SYNC_PLUSE = 2;
 localparam VERTICAL_VISIBLE_AREA = 480;
 localparam VERTICAL_BACK_PROCH = 33;
+localparam VERTICAL_FRONT_PROCH = 10;
 localparam VERTICAL_WHOLE_FRAME = 525;
 
 always @(posedge clk_25m or negedge rst_n)
@@ -95,15 +95,13 @@ end
 
 wire visible_area;
 
-assign visible_area = col >= (HORIZONTAL_FRONT_PROCH + HORIZONTAL_SYNC_PLUSE) && col < (HORIZONTAL_FRONT_PROCH + HORIZONTAL_SYNC_PLUSE + HORIZONTAL_VISIBLE_AREA) && row >= (VERTICAL_FRONT_PROCH + VERTICAL_SYNC_PLUSE) && row < (VERTICAL_FRONT_PROCH + VERTICAL_SYNC_PLUSE + VERTICAL_VISIBLE_AREA);
+assign visible_area = col > (HORIZONTAL_SYNC_PLUSE + HORIZONTAL_BACK_PROCH) && col < (HORIZONTAL_SYNC_PLUSE + HORIZONTAL_BACK_PROCH + HORIZONTAL_VISIBLE_AREA) && row >= (VERTICAL_SYNC_PLUSE + VERTICAL_BACK_PROCH) && row < (VERTICAL_SYNC_PLUSE + VERTICAL_BACK_PROCH + VERTICAL_VISIBLE_AREA);
 
 //assign hsync = ~( col > HORIZONTAL_FRONT_PROCH && col <= HORIZONTAL_FRONT_PROCH + HORIZONTAL_SYNC_PLUSE );
 //assign vsync = ~( row > VERTICAL_FRONT_PROCH && row <= VERTICAL_FRONT_PROCH + VERTICAL_SYNC_PLUSE );
 
-// I dont know why should pulldown during FRONT_PROCH. by cw1997
-assign hsync = col > (HORIZONTAL_FRONT_PROCH + HORIZONTAL_SYNC_PLUSE); // && (col < HORIZONTAL_FRONT_PROCH); 
-assign vsync = row > (VERTICAL_FRONT_PROCH + VERTICAL_SYNC_PLUSE); // && (row < VERTICAL_FRONT_PROCH);
-
+assign hsync = col >= HORIZONTAL_SYNC_PLUSE; 
+assign vsync = row >= VERTICAL_FRONT_PROCH ;
 always @(posedge clk_25m or negedge rst_n)
 begin
 	if (!rst_n) begin
@@ -113,6 +111,9 @@ begin
 		cursor <= 0;
 	end 
 	else if (visible_area) begin
+//			vga_r <= 3'b111;
+//			vga_g <= 3'b111;
+//			vga_b <= 2'b11; 
 		if (cursor == 640*480-1) begin
 			cursor <= 0;
 		end
@@ -127,9 +128,9 @@ begin
 			vga_b <= 2'b11; 
 		end
 		else begin
-			vga_r <= 0;
-			vga_g <= 0;
-			vga_b <= 0;
+			vga_r <= 3'b111;
+			vga_g <= 3'b111;
+			vga_b <= 2'b11;
 		end 
 	end
 	else begin
