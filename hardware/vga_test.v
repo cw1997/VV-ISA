@@ -20,6 +20,7 @@ vga vga(
 	.vga_r(vga_r),
 	.vga_g(vga_g),
 	.vga_b(vga_b),
+	.clk_25m_by_pll(clk_25m_by_pll),
 	.clk_25m(clk_25m)
 );
 

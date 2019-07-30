@@ -9,7 +9,8 @@ module vga(
 	
 	input[100-1:0] video_memory,
 	
-	output reg clk_25m
+	//output clk_25m_by_pll,
+	output clk_25m
 );
 
 //#--------------------VGA----------------------#
@@ -24,30 +25,52 @@ module vga(
 //set_location_assignment	PIN_6	-to	vga_b[0]
 //set_location_assignment	PIN_8	-to	vga_b[1]
 
+wire locked = 1;
+
+pll pll(
+	.areset(~rst_n),
+	.inclk0(clk),
+	.c0(clk_25m),
+	.locked(locked),
+);
+
 
 //reg clk_25m;
-reg div_cnt;
-
-always @(posedge clk or negedge rst_n)
-begin
-	if (!rst_n) begin
-		div_cnt <= 0;
-		clk_25m <= 0;
-	end 
-	else if (div_cnt == 0) begin
-		div_cnt <= 0;
-		clk_25m <= ~clk_25m;
-	end 
-	else begin
-		div_cnt <= div_cnt + 1;
-	end
-end
+//reg[7:0] div_cnt;
+//
+//always @(posedge clk or negedge rst_n)
+//begin
+//	if (!rst_n) begin
+//		div_cnt <= 0;
+//		clk_25m <= 0;
+//	end 
+//	else if (div_cnt == 99) begin
+//		div_cnt <= 0;
+//		clk_25m <= ~clk_25m;
+//	end 
+//	else begin
+//		div_cnt <= div_cnt + 1;
+//	end
+//end
 
 reg[1:0] cursor;
 reg[11:0] row;
 reg[11:0] col;
 reg[11:0] x;
 reg[11:0] y;
+
+
+localparam HORIZONTAL_FRONT_PROCH = 16;
+localparam HORIZONTAL_SYNC_PLUSE = 96;
+localparam HORIZONTAL_VISIBLE_AREA = 640;
+localparam HORIZONTAL_BACK_PROCH = 48;
+localparam HORIZONTAL_WHOLE_LINE = 800;
+
+localparam VERTICAL_FRONT_PROCH = 10;
+localparam VERTICAL_SYNC_PLUSE = 2;
+localparam VERTICAL_VISIBLE_AREA = 480;
+localparam VERTICAL_BACK_PROCH = 33;
+localparam VERTICAL_WHOLE_FRAME = 525;
 
 always @(posedge clk_25m or negedge rst_n)
 begin
@@ -69,19 +92,6 @@ begin
 		end
 	end
 end
-
-
-localparam HORIZONTAL_FRONT_PROCH = 16;
-localparam HORIZONTAL_SYNC_PLUSE = 96;
-localparam HORIZONTAL_VISIBLE_AREA = 640;
-localparam HORIZONTAL_BACK_PROCH = 48;
-localparam HORIZONTAL_WHOLE_LINE = 800;
-
-localparam VERTICAL_FRONT_PROCH = 10;
-localparam VERTICAL_SYNC_PLUSE = 2;
-localparam VERTICAL_VISIBLE_AREA = 480;
-localparam VERTICAL_BACK_PROCH = 33;
-localparam VERTICAL_WHOLE_FRAME = 525;
 
 wire visible_area;
 
