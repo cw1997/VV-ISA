@@ -53,7 +53,7 @@ pll pll(
 //	end
 //end
 
-reg[1:0] cursor;
+reg[3:0] cursor;
 reg[11:0] row;
 reg[11:0] col;
 reg[11:0] x;
@@ -128,9 +128,9 @@ begin
 			vga_b <= 2'b11; 
 		end
 		else begin
-			vga_r <= 3'b111;
-			vga_g <= 3'b111;
-			vga_b <= 2'b11;
+			vga_r <= 3'b000;
+			vga_g <= 3'b000;
+			vga_b <= 2'b00;
 		end 
 	end
 	else begin
